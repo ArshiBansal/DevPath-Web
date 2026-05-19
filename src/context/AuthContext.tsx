@@ -36,6 +36,7 @@ interface User {
     };
     points?: number;
     achievements?: string[]; // Array of achievement IDs
+    completedQuizzes?: string[]; // Array of completed quiz IDs
     claimedRewards?: string[]; // Array of claimed reward IDs
     githubStats?: {
         connected: boolean;
@@ -58,6 +59,9 @@ interface User {
         company?: string;
         location?: string;
         createdAt?: string;
+        linesAdded?: number;
+        linesRemoved?: number;
+        linesContributed?: number;
     };
     followers?: string[]; // Array of user UIDs
     following?: string[]; // Array of user UIDs
@@ -188,6 +192,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                                 level: 0,
                                 badges: [],
                                 achievements: [],
+                                completedQuizzes: [],
                                 claimedRewards: [],
                                 followers: [],
                                 following: [],

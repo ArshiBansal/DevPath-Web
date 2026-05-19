@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { ExternalLink, Newspaper, RefreshCw, AlertCircle } from 'lucide-react';
-import Image from 'next/image';
 import styles from './CodingNews.module.css';
 
 interface NewsItem {
@@ -39,6 +39,36 @@ const FALLBACK_NEWS: NewsItem[] = [
         image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=800"
     }
 ];
+
+const FALLBACK_NEWS_IMAGE =
+    'https://images.unsplash.com/photo-1504639725590-34d0984388bd?q=80&w=1000&auto=format&fit=crop';
+
+interface NewsCardImageProps {
+    src: string;
+    alt: string;
+    sizes?: string;
+    priority?: boolean;
+}
+
+function NewsCardImage({ src, alt, sizes, priority }: NewsCardImageProps) {
+    const [imgSrc, setImgSrc] = useState(src);
+
+    useEffect(() => {
+        setImgSrc(src);
+    }, [src]);
+
+    return (
+        <Image
+            src={imgSrc}
+            alt={alt}
+            fill
+            className={styles.image}
+            sizes={sizes}
+            priority={priority}
+            onError={() => setImgSrc(FALLBACK_NEWS_IMAGE)}
+        />
+    );
+}
 
 export default function CodingNews() {
     const [news, setNews] = useState<NewsItem[]>([]);
@@ -191,11 +221,9 @@ export default function CodingNews() {
                                 >
                                     <div className={styles.imageWrapper}>
                                         {item.image ? (
-                                            <Image 
+                                            <NewsCardImage 
                                                 src={item.image} 
                                                 alt={item.title} 
-                                                fill
-                                                className={styles.image}
                                                 sizes="(max-width: 640px) 280px, 320px"
                                                 priority={index < 2}
                                             />

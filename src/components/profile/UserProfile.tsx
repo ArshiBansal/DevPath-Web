@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { teamMembers } from '@/data/team';
-import { Trophy, Flame, Star, Target, MapPin, Link as LinkIcon, Calendar, Phone, LogOut, Camera, Save, X, Github, Instagram, Linkedin, CheckCircle, Share2, Shield, Copy, Check, Plus, Edit3, Users, Globe, BookOpen, GitMerge } from 'lucide-react';
+import { Trophy, Flame, Star, Target, MapPin, Link as LinkIcon, Calendar, Phone, LogOut, Camera, Save, X, Github, Instagram, Linkedin, CheckCircle, Share2, Shield, Copy, Check, Plus, Edit3, Users, Globe, BookOpen, GitMerge, Code2 } from 'lucide-react';
 import styles from './Profile.module.css';
 import 'github-markdown-css/github-markdown.css';
 import ProjectUploadModal from '@/components/projects/ProjectUploadModal';
@@ -20,7 +21,16 @@ import { collection, query, where, orderBy, getDocs, doc, updateDoc, arrayUnion,
 import { db } from '@/lib/firebase';
 import { calculateLevel } from '@/lib/points';
 import { getEmbedUrl } from '@/lib/utils';
+import { GIT_FALLBACK_STATS } from '@/lib/github';
 
+/**
+ * UserProfile component renders the main dashboard profile page for authenticated developers.
+ * It manages:
+ * - Local layout state for editing avatars and bios.
+ * - Loading and sorting uploaded developer projects from Firestore.
+ * - Real-time calculations of gamification Dev Points, progress levels, and achievements.
+ * - Rendering animated progress rings and privacy toggle modals.
+ */
 export default function UserProfile() {
     const { user, logout, updateUserProfile } = useAuth();
     const router = useRouter();
@@ -32,6 +42,23 @@ export default function UserProfile() {
     }, [user, router]);
 
     const [isEditingPhoto, setIsEditingPhoto] = useState(false);
+    const [mountedProgress, setMountedProgress] = useState(0);
+
+    const levelInfo = calculateLevel(user?.points || 0);
+    const targetProgress = levelInfo.progress;
+
+    /**
+     * Triggers animated loading effect for the custom circular progress ring
+     * once the component is mounted.
+     */
+    useEffect(() => {
+        if (user) {
+            const timer = setTimeout(() => {
+                setMountedProgress(targetProgress);
+            }, 100);
+            return () => clearTimeout(timer);
+        }
+    }, [user, targetProgress]);
     const [newPhotoURL, setNewPhotoURL] = useState('');
     const [isSaving, setIsSaving] = useState(false);
     const [showPrivacyModal, setShowPrivacyModal] = useState(false);
@@ -258,11 +285,12 @@ export default function UserProfile() {
                     {/* Profile Card */}
                     <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
                         <div className="relative w-64 h-64 md:w-72 md:h-72 lg:w-full lg:h-auto lg:aspect-square mb-4 group">
-                            <div className="w-full h-full rounded-full overflow-hidden border-4 border-card shadow-xl">
-                                <img
+                            <div className="w-full h-full rounded-full overflow-hidden border-4 border-card shadow-xl relative">
+                                <Image
                                     src={user.photoURL || `https://ui-avatars.com/api/?name=${user.name}&background=random`}
                                     alt={user.name || 'User'}
-                                    className="w-full h-full object-cover"
+                                    fill
+                                    className="object-cover"
                                 />
                             </div>
                             <button
@@ -384,31 +412,105 @@ export default function UserProfile() {
 
                     {/* Hero / Intro */}
                     <div className="bg-card border border-border rounded-xl p-8 relative overflow-hidden">
-                        <div className="absolute top-0 right-0 p-4 opacity-10">
+                        <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
                             <Target size={120} />
                         </div>
-                        <h2 className="text-3xl font-bold mb-2">Hi 👋, I'm {user.name}</h2>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+                            {/* Left Content Column */}
+                            <div className="md:col-span-2 space-y-4 text-left">
+                                <h2 className="text-3xl font-bold">Hi 👋, I'm {user.name}</h2>
+                                
+                                {/* Level & Points Display */}
+                                <div className="flex flex-wrap items-center gap-3">
+                                    {calculateLevel(user.points || 0).currentLevel.name === 'Sanrakshak' ? (
+                                        <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                                            <Shield size={14} />
+                                            Sanrakshak
+                                        </span>
+                                    ) : (
+                                        <span className={`px-3 py-1 rounded-full text-sm font-bold uppercase tracking-wider ${calculateLevel(user.points || 0).currentLevel.bg} ${calculateLevel(user.points || 0).currentLevel.color} border ${calculateLevel(user.points || 0).currentLevel.border}`}>
+                                            {calculateLevel(user.points || 0).currentLevel.name}
+                                        </span>
+                                    )}
+                                    <span className="text-muted-foreground text-sm font-mono">
+                                        {user.points || 0} Dev Points
+                                    </span>
+                                </div>
 
-                        {/* Level & Points Display */}
-                        <div className="flex items-center gap-3 mb-6">
-                            {calculateLevel(user.points || 0).currentLevel.name === 'Sanrakshak' ? (
-                                <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
-                                    <Shield size={14} />
-                                    Sanrakshak
-                                </span>
-                            ) : (
-                                <span className={`px-3 py-1 rounded-full text-sm font-bold uppercase tracking-wider ${calculateLevel(user.points || 0).currentLevel.bg} ${calculateLevel(user.points || 0).currentLevel.color} border ${calculateLevel(user.points || 0).currentLevel.border}`}>
-                                    {calculateLevel(user.points || 0).currentLevel.name}
-                                </span>
-                            )}
-                            <span className="text-muted-foreground text-sm font-mono">
-                                {user.points || 0} Dev Points
-                            </span>
+                                <p className="text-muted-foreground text-base leading-relaxed">
+                                    {user.bio || "Passionate developer building amazing things. Welcome to my profile!"}
+                                </p>
+                            </div>
+
+                            {/* Right Progress Ring Column */}
+                            <div className="flex justify-center md:justify-end w-full">
+                                <div className={styles.ringWrapper}>
+                                    <div className={styles.progressContainer}>
+                                        {/* Glowing SVG Filter and Gradient */}
+                                        <svg className={styles.svgRing} width="140" height="140">
+                                            <defs>
+                                                <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                                    <stop offset="0%" stopColor="#00bfbf" />
+                                                    <stop offset="100%" stopColor="#8b5cf6" />
+                                                </linearGradient>
+                                            </defs>
+                                            
+                                            {/* Background Track Circle */}
+                                            <circle 
+                                                className={styles.circleBg}
+                                                cx="70" 
+                                                cy="70" 
+                                                r="60" 
+                                            />
+                                            
+                                            {/* Active Animated Progress Circle */}
+                                            <circle 
+                                                className={styles.circleProgress}
+                                                cx="70" 
+                                                cy="70" 
+                                                r="60" 
+                                                stroke="url(#progressGradient)"
+                                                strokeDasharray="376.99"
+                                                strokeDashoffset={376.99 * (1 - mountedProgress / 100)}
+                                            />
+                                        </svg>
+                                        
+                                        {/* Content inside the Ring */}
+                                        <div className={styles.centerText}>
+                                            {calculateLevel(user.points || 0).currentLevel.name === 'Sanrakshak' ? (
+                                                <div className="flex flex-col items-center">
+                                                    <Trophy className="text-yellow-500 h-8 w-8 animate-bounce" />
+                                                    <span className="text-[10px] font-bold text-yellow-500 uppercase tracking-widest mt-1">MAX</span>
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    <span className={styles.percentText}>
+                                                        {Math.round(calculateLevel(user.points || 0).progress)}%
+                                                    </span>
+                                                    <span className={styles.lvlText}>
+                                                        Progress
+                                                    </span>
+                                                </>
+                                            )}
+                                        </div>
+                                    </div>
+                                    
+                                    {/* Sub-label under the Ring */}
+                                    <div className="text-center">
+                                        <p className="text-xs font-bold text-foreground mb-0.5">
+                                            {calculateLevel(user.points || 0).currentLevel.name === 'Sanrakshak' ? 'Sanrakshak Rank' : `Level Progress`}
+                                        </p>
+                                        <p className={styles.xpDetails}>
+                                            {calculateLevel(user.points || 0).currentLevel.name === 'Sanrakshak' 
+                                                ? `${(user.points || 0).toLocaleString()} XP`
+                                                : `${(user.points || 0).toLocaleString()} / ${(calculateLevel(user.points || 0).nextLevelPoints).toLocaleString()} XP`
+                                            }
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-
-                        <p className="text-muted-foreground max-w-2xl">
-                            {user.bio || "Passionate developer building amazing things. Welcome to my profile!"}
-                        </p>
                     </div>
 
                     {/* Login Heatmap */}
@@ -424,26 +526,36 @@ export default function UserProfile() {
                             <h3 className="text-xl font-bold flex items-center gap-2 mb-4">
                                 <Github className="text-primary" size={20} /> GitHub Activity
                             </h3>
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
                                 <div className="flex flex-col items-center p-4 bg-muted/30 rounded-xl border border-border/50 hover:border-primary/50 transition-colors">
                                     <BookOpen className="mb-2 text-primary h-6 w-6" />
                                     <span className="text-2xl font-bold">{user.githubStats.repos || 0}</span>
-                                    <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Repositories</span>
+                                    <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider text-center">Repositories</span>
                                 </div>
                                 <div className="flex flex-col items-center p-4 bg-muted/30 rounded-xl border border-border/50 hover:border-primary/50 transition-colors">
                                     <Star className="mb-2 text-yellow-500 h-6 w-6" />
                                     <span className="text-2xl font-bold">{user.githubStats.totalStars || 0}</span>
-                                    <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Total Stars</span>
+                                    <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider text-center">Total Stars</span>
                                 </div>
                                 <div className="flex flex-col items-center p-4 bg-muted/30 rounded-xl border border-border/50 hover:border-primary/50 transition-colors">
                                     <Users className="mb-2 text-blue-500 h-6 w-6" />
                                     <span className="text-2xl font-bold">{user.githubStats.followers || 0}</span>
-                                    <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Followers</span>
+                                    <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider text-center">Followers</span>
                                 </div>
                                 <div className="flex flex-col items-center p-4 bg-muted/30 rounded-xl border border-border/50 hover:border-primary/50 transition-colors">
                                     <GitMerge className="mb-2 text-purple-500 h-6 w-6" />
                                     <span className="text-2xl font-bold">{user.githubStats.following || 0}</span>
-                                    <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Following</span>
+                                    <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider text-center">Following</span>
+                                </div>
+                                <div className="flex flex-col items-center p-4 bg-muted/30 rounded-xl border border-border/50 hover:border-primary/50 transition-colors">
+                                    <Code2 className="mb-2 text-emerald-500 h-6 w-6" />
+                                    <span className="text-2xl font-bold">{(user.githubStats.linesContributed ?? GIT_FALLBACK_STATS[(user.githubStats.username || '').toLowerCase()]?.additions ?? 0).toLocaleString()}</span>
+                                    <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider text-center">Lines Contributed</span>
+                                </div>
+                                <div className="flex flex-col items-center p-4 bg-muted/30 rounded-xl border border-border/50 hover:border-primary/50 transition-colors">
+                                    <GitMerge className="mb-2 text-orange-500 h-6 w-6" />
+                                    <span className="text-2xl font-bold">{user.githubStats.contributions ?? GIT_FALLBACK_STATS[(user.githubStats.username || '').toLowerCase()]?.commits ?? 0}</span>
+                                    <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider text-center">Commits Contributed</span>
                                 </div>
                             </div>
 
@@ -451,18 +563,36 @@ export default function UserProfile() {
                             {user.githubStats.username && (
                                 <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className="w-full">
-                                        <picture>
-                                            <source media="(prefers-color-scheme: dark)" srcSet={`https://github-readme-stats-salesp07.vercel.app/api?username=${user.githubStats.username}&count_private=true&show_icons=true&title_color=00bfbf&icon_color=00bfbf&text_color=c9d1d9&bg_color=0d1117&rank_icon=github&border_radius=20&hide_border=true`} />
-                                            <source media="(prefers-color-scheme: light)" srcSet={`https://github-readme-stats-salesp07.vercel.app/api?username=${user.githubStats.username}&count_private=true&show_icons=true&title_color=000000&icon_color=000000&text_color=000000&bg_color=ffffff&rank_icon=github&border_radius=20&hide_border=true`} />
-                                            <img alt="GitHub Stats" src={`https://github-readme-stats-salesp07.vercel.app/api?username=${user.githubStats.username}&count_private=true&show_icons=true&title_color=00bfbf&icon_color=00bfbf&text_color=c9d1d9&bg_color=0d1117&rank_icon=github&border_radius=20&hide_border=true`} className="w-full h-auto" />
-                                        </picture>
+                                        <Image
+                                            alt="GitHub Stats"
+                                            src={`https://github-readme-stats-salesp07.vercel.app/api?username=${user.githubStats.username}&count_private=true&show_icons=true&title_color=00bfbf&icon_color=00bfbf&text_color=c9d1d9&bg_color=0d1117&rank_icon=github&border_radius=20&hide_border=true`}
+                                            width={467}
+                                            height={195}
+                                            className="w-full h-auto hidden dark:block"
+                                        />
+                                        <Image
+                                            alt="GitHub Stats"
+                                            src={`https://github-readme-stats-salesp07.vercel.app/api?username=${user.githubStats.username}&count_private=true&show_icons=true&title_color=000000&icon_color=000000&text_color=000000&bg_color=ffffff&rank_icon=github&border_radius=20&hide_border=true`}
+                                            width={467}
+                                            height={195}
+                                            className="w-full h-auto dark:hidden"
+                                        />
                                     </div>
                                     <div className="w-full">
-                                        <picture>
-                                            <source media="(prefers-color-scheme: dark)" srcSet={`https://github-readme-streak-stats-salesp07.vercel.app/?user=${user.githubStats.username}&count_private=true&border_radius=20&ring=00bfbf&stroke=c9d1d9&background=0d1117&fire=00bfbf&currStreakNum=00bfbf&sideNums=00bfbf&datesside=00bfbf&Labelscurr=00bfbf&currStreakLabel=00bfbf&sideLabels=00bfbf&dates=c9d1d9&border=c9d1d9&hide_border=true`} />
-                                            <source media="(prefers-color-scheme: light)" srcSet={`https://github-readme-streak-stats-salesp07.vercel.app/?user=${user.githubStats.username}&count_private=true&border_radius=20&ring=000000&stroke=000000&background=ffffff&fire=ff0000&currStreakNum=000000&sideNums=000000&datesside=000000&Labelscurr=000000&currStreakLabel=000000&sideLabels=000000&dates=000000&border=000000&hide_border=true`} />
-                                            <img alt="GitHub Streak Stats" src={`https://github-readme-streak-stats-salesp07.vercel.app/?user=${user.githubStats.username}&count_private=true&border_radius=20&ring=00bfbf&stroke=c9d1d9&background=0d1117&fire=00bfbf&currStreakNum=00bfbf&sideNums=00bfbf&sideNums=00bfbf&datesside=00bfbf&Labelscurr=00bfbf&currStreakLabel=00bfbf&sideLabels=00bfbf&dates=c9d1d9&border=c9d1d9&hide_border=true`} className="w-full h-auto" />
-                                        </picture>
+                                        <Image
+                                            alt="GitHub Streak Stats"
+                                            src={`https://github-readme-streak-stats-salesp07.vercel.app/?user=${user.githubStats.username}&count_private=true&border_radius=20&ring=00bfbf&stroke=c9d1d9&background=0d1117&fire=00bfbf&currStreakNum=00bfbf&sideNums=00bfbf&datesside=00bfbf&Labelscurr=00bfbf&currStreakLabel=00bfbf&sideLabels=00bfbf&dates=c9d1d9&border=c9d1d9&hide_border=true`}
+                                            width={467}
+                                            height={195}
+                                            className="w-full h-auto hidden dark:block"
+                                        />
+                                        <Image
+                                            alt="GitHub Streak Stats"
+                                            src={`https://github-readme-streak-stats-salesp07.vercel.app/?user=${user.githubStats.username}&count_private=true&border_radius=20&ring=000000&stroke=000000&background=ffffff&fire=ff0000&currStreakNum=000000&sideNums=000000&datesside=000000&Labelscurr=000000&currStreakLabel=000000&sideLabels=000000&dates=000000&border=000000&hide_border=true`}
+                                            width={467}
+                                            height={195}
+                                            className="w-full h-auto dark:hidden"
+                                        />
                                     </div>
                                 </div>
                             )}
@@ -758,9 +888,11 @@ export default function UserProfile() {
                             ) : (
                                 modalUsers.map(u => (
                                     <div key={u.uid} className="flex items-center gap-3 p-2 hover:bg-muted rounded-lg transition-colors">
-                                        <img
+                                        <Image
                                             src={u.photoURL || `https://ui-avatars.com/api/?name=${u.name}&background=random`}
                                             alt={u.name}
+                                            width={40}
+                                            height={40}
                                             className="w-10 h-10 rounded-full object-cover"
                                         />
                                         <div className="flex-1 overflow-hidden">
@@ -809,11 +941,12 @@ export default function UserProfile() {
                                     />
                                 </div>
                             ) : selectedProject.screenshots && selectedProject.screenshots.length > 0 && (
-                                <div className="aspect-video rounded-xl overflow-hidden bg-muted">
-                                    <img
+                                <div className="aspect-video rounded-xl overflow-hidden bg-muted relative">
+                                    <Image
                                         src={selectedProject.screenshots[0]}
                                         alt={selectedProject.title}
-                                        className="w-full h-full object-contain"
+                                        fill
+                                        className="object-contain"
                                     />
                                 </div>
                             )}

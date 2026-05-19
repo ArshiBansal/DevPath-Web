@@ -20,8 +20,8 @@ import { db } from '@/lib/firebase';
 import Image from 'next/image';
 import { calculateUserPointsAndBadges } from '@/lib/point-calculation';
 
-const SUPER_ADMIN_EMAIL = "devpathind.community@gmail.com";
-const SUPER_ADMIN_PASSWORD = "Aditya@2006@#";
+const SUPER_ADMIN_EMAIL = process.env.NEXT_PUBLIC_SUPER_ADMIN_EMAIL;
+const SUPER_ADMIN_PASSWORD = process.env.NEXT_PUBLIC_SUPER_ADMIN_PASSWORD;
 
 interface AdminDashboardProps {
     initialAuth?: boolean;
@@ -1023,7 +1023,7 @@ export default function AdminDashboard({ initialAuth = false }: AdminDashboardPr
 
             if (keyDoc.exists() && keyDoc.data().value === trimmedKey) {
                 // Auto-login as Super Admin if not already logged in as such
-                if (!auth.currentUser || auth.currentUser.email !== SUPER_ADMIN_EMAIL) {
+                if (SUPER_ADMIN_EMAIL && SUPER_ADMIN_PASSWORD && (!auth.currentUser || auth.currentUser.email !== SUPER_ADMIN_EMAIL)) {
                     try {
                         await signInWithEmailAndPassword(auth, SUPER_ADMIN_EMAIL, SUPER_ADMIN_PASSWORD);
                     } catch (loginError: any) {
@@ -1276,8 +1276,8 @@ export default function AdminDashboard({ initialAuth = false }: AdminDashboardPr
                                             placeholder="https://..."
                                         />
                                         {notificationForm.image && (
-                                            <div className="w-10 h-10 rounded-lg overflow-hidden border border-border shrink-0">
-                                                <img src={notificationForm.image} alt="Preview" className="w-full h-full object-cover" />
+                                            <div className="relative w-10 h-10 rounded-lg overflow-hidden border border-border shrink-0">
+                                                <Image src={notificationForm.image} alt="Preview" fill className="object-cover" />
                                             </div>
                                         )}
                                     </div>
@@ -2349,7 +2349,7 @@ export default function AdminDashboard({ initialAuth = false }: AdminDashboardPr
                                                     <div className="font-bold">{sponsor.name}</div>
                                                     <div className="text-xs text-muted-foreground truncate">{sponsor.url}</div>
                                                 </div>
-                                                {sponsor.logo && <img src={sponsor.logo} alt={sponsor.name} className="w-8 h-8 object-contain" />}
+                                                {sponsor.logo && <Image src={sponsor.logo} alt={sponsor.name} width={32} height={32} className="w-8 h-8 object-contain" />}
                                                 <button
                                                     type="button"
                                                     onClick={() => {

@@ -58,13 +58,9 @@ This project leverages a modern and powerful technology stack:
 
 ## 📸 Screenshots
 
-*(Add your screenshots here)*
-
-| Home Page | Dashboard |
+| Home Page | Community |
 | :---: | :---: |
-| <img src="public/placeholder-home.png" alt="Home Page" width="400"/> | <img src="public/placeholder-dashboard.png" alt="Dashboard" width="400"/> |
-
-> **Note**: These are placeholders. Please upload actual screenshots to the `public/` folder and link them here.
+| <img src="public/screenshot-home.png" alt="Home Page" height="250"/> | <img src="public/screenshot-community.png" alt="Community" height="250"/> |
 
 ## 🏁 Getting Started
 
@@ -135,6 +131,22 @@ To run this project locally, you'll need your own Firebase project:
 
 5. **Open your browser:**
    Navigate to [http://localhost:3000](http://localhost:3000) to see the application running.
+
+### 🚀 Firebase Hosting Deployment
+
+To deploy the production-ready site directly to Firebase Hosting:
+
+1. **Build the production static export**:
+   This compiles the Next.js App Router files into highly optimized static assets inside the `out/` directory:
+   ```bash
+   npm run build
+   ```
+
+2. **Deploy to Firebase**:
+   Deploy the build files along with custom Firestore indexes and rules to the live platform:
+   ```bash
+   npx firebase deploy
+   ```
 
 ## 📜 Scripts
 
