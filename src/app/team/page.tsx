@@ -1,8 +1,9 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import Link from 'next/link';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { Github, Linkedin, Instagram } from 'lucide-react';
 import { teamMembers, TeamMember } from '@/data/team';
 
@@ -14,10 +15,8 @@ interface BorderGlowProps {
     borderRadius?: number;
     glowRadius?: number;
     glowIntensity?: number;
-    coneSpread?: number;
     animated?: boolean;
     colors?: string[];
-    fillOpacity?: number;
 }
 
 const GRADIENT_POSITIONS = ['80% 55%', '69% 34%', '8% 6%', '41% 38%', '86% 85%', '82% 18%', '51% 4%'];
@@ -29,7 +28,7 @@ const buildMeshGradients = (colors: string[]): string[] => {
         const color = colors[Math.min(COLOR_MAP[i], colors.length - 1)];
         gradients.push(`radial-gradient(at ${GRADIENT_POSITIONS[i]}, ${color} 0px, transparent 50%)`);
     }
-    gradients.push(`linear-gradient(${colors[0]} 0 100%)`);
+    gradients.push(`linear-gradient(${colors[0]} 0%, ${colors[0]} 100%)`);
     return gradients;
 };
 
@@ -202,19 +201,19 @@ const rolePalette: Record<TeamMember['category'], string> = {
 };
 
 const TeamTile = ({ member, index, stepClass = '' }: { member: TeamMember; index: number; stepClass?: string }) => {
+    const shouldReduceMotion = useReducedMotion();
     return (
         <BorderGlow
             className={stepClass}
             glowColor="56 189 248"
             glowRadius={26}
             colors={['#22d3ee', '#38bdf8', '#6366f1']}
-            fillOpacity={0.4}
         >
             <motion.article
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
+                whileInView={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-20px' }}
-                transition={{ duration: 0.35, delay: (index % 12) * 0.03 }}
+                transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.35, delay: (index % 12) * 0.03 }}
                 className="group relative aspect-[5/4] sm:aspect-[6/5] overflow-hidden bg-[#111a34]"
                 style={{
                     clipPath: 'polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 0 100%)'
@@ -258,18 +257,19 @@ const ValueCard = ({
     </article>
 );
 
-const CoreRoleCard = ({ member, index }: { member: TeamMember; index: number }) => (
+const CoreRoleCard = ({ member, index }: { member: TeamMember; index: number }) => {
+    const shouldReduceMotion = useReducedMotion();
+    return (
     <BorderGlow
         glowColor="168 85 247"
         glowRadius={28}
         colors={['#a855f7', '#22d3ee', '#38bdf8']}
-        fillOpacity={0.45}
     >
         <motion.article
-            initial={{ opacity: 0, y: 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
+            whileInView={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.28, delay: (index % 6) * 0.04 }}
+            transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.28, delay: (index % 6) * 0.04 }}
             className="relative overflow-hidden bg-[#13213f]"
             style={{ clipPath: 'polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%)' }}
         >
@@ -307,7 +307,8 @@ const CoreRoleCard = ({ member, index }: { member: TeamMember; index: number }) 
             </div>
         </motion.article>
     </BorderGlow>
-);
+    );
+};
 
 export default function TeamPage() {
     const owner = teamMembers.find(member => member.category === 'Owner');
@@ -320,9 +321,10 @@ export default function TeamPage() {
     const leftStepPattern = ['mt-0', 'mt-0', 'mt-0', 'mt-0'];
 
     return (
-        <main className="min-h-screen bg-[#090f1f]">
-            <section className="relative overflow-hidden">
-                <div className="absolute inset-0 pointer-events-none">
+        <>
+            <section className="min-h-screen bg-[#090f1f]">
+                <div className="relative overflow-hidden">
+                    <div className="absolute inset-0 pointer-events-none">
                     <div
                         className="absolute -left-24 top-20 h-[34rem] w-[34rem] rounded-full"
                         style={{ background: 'radial-gradient(circle, rgba(56,189,248,0.2), transparent 70%)' }}
@@ -376,7 +378,6 @@ export default function TeamPage() {
                                         glowColor="56 189 248"
                                         glowRadius={36}
                                         colors={['#22d3ee', '#38bdf8', '#6366f1']}
-                                        fillOpacity={0.48}
                                         edgeSensitivity={22}
                                     >
                                         <div className="relative w-52 h-52 sm:w-56 sm:h-56 rounded-xl overflow-hidden">
@@ -439,6 +440,7 @@ export default function TeamPage() {
                             )}
                         </aside>
                     </div>
+                    </div>
                 </div>
             </section>
 
@@ -463,18 +465,18 @@ export default function TeamPage() {
                             <p className="text-xs uppercase tracking-[0.16em] text-slate-500">Explore</p>
                             <h3 className="mt-2 text-2xl font-semibold text-slate-900">Learn more about the team values</h3>
                             <p className="mt-2 text-slate-600 text-sm">Understand how our team collaborates across mentorship, content, and technical initiatives.</p>
-                            <a href="/community" className="inline-block mt-5 text-sm font-semibold text-sky-700 hover:text-sky-800">Read more</a>
+                            <Link href="/community" className="inline-block mt-5 text-sm font-semibold text-sky-700 hover:text-sky-800">Read more</Link>
                         </article>
 
                         <article className="rounded-2xl border border-slate-200 p-6 bg-gradient-to-br from-[#0f1731] to-[#17254a] text-white">
                             <p className="text-xs uppercase tracking-[0.16em] text-cyan-200/80">Opportunities</p>
                             <h3 className="mt-2 text-2xl font-semibold">Join the team</h3>
                             <p className="mt-2 text-cyan-50/80 text-sm">We are continuously expanding with volunteer and leadership roles in multiple cities.</p>
-                            <a href="/signup" className="inline-block mt-5 text-sm font-semibold text-cyan-200 hover:text-cyan-100">View openings</a>
+                            <Link href="/signup" className="inline-block mt-5 text-sm font-semibold text-cyan-200 hover:text-cyan-100">View openings</Link>
                         </article>
                     </div>
                 </div>
             </section>
-        </main>
+        </>
     );
 }
