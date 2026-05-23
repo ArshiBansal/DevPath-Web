@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react';
 import { Github, Star, GitFork, CircleDot, CircleOff, GitPullRequest, GitPullRequestArrow, BookOpen, Plus, ExternalLink, Loader2, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 
+const CircleOff = AlertCircle;
+const GitPullRequestArrow = GitPullRequest;
+
 interface Repo {
     id: number;
     name: string;
@@ -194,6 +197,7 @@ export default function GitHubDashboard({ accessToken }: GitHubDashboardProps) {
                             <Link
                                 href={selectedRepo.html_url}
                                 target="_blank"
+                                rel="noopener noreferrer"
                                 className="p-2 hover:bg-muted rounded-lg transition-colors"
                             >
                                 <ExternalLink size={20} />
@@ -246,23 +250,22 @@ export default function GitHubDashboard({ accessToken }: GitHubDashboardProps) {
                                 {loadingIssues ? (
                                     <div className="text-center py-4 text-muted-foreground text-sm">Loading issues...</div>
                                 ) : issues.length > 0 ? (
-                                    issues.map(issue => (
-                                        (() => {
-                                            const isClosed = issue.state === 'closed' || Boolean(issue.closed_at);
-                                            const isPullRequest = Boolean(issue.pull_request);
+                                    issues.map(issue => {
+                                        const isClosed = issue.state === 'closed' || Boolean(issue.closed_at);
+                                        const isPullRequest = Boolean(issue.pull_request);
 
-                                            return (
+                                        return (
                                         <div key={issue.id} className="flex items-center justify-between p-3 bg-muted/20 rounded-lg hover:bg-muted/40 transition-colors">
                                             <div className="flex items-center gap-3 overflow-hidden">
                                                 {isPullRequest ? (
                                                     isClosed ? (
-                                                        <GitPullRequestArrow size={16} className="text-gray-500 shrink-0" />
+                                                        <GitPullRequestArrow size={16} className="text-muted-foreground shrink-0" />
                                                     ) : (
                                                         <GitPullRequest size={16} className="text-purple-500 shrink-0" />
                                                     )
                                                 ) : (
                                                     isClosed ? (
-                                                        <CircleOff size={16} className="text-gray-500 shrink-0" />
+                                                        <CircleOff size={16} className="text-muted-foreground shrink-0" />
                                                     ) : (
                                                         <CircleDot size={16} className="text-green-500 shrink-0" />
                                                     )
@@ -272,13 +275,12 @@ export default function GitHubDashboard({ accessToken }: GitHubDashboardProps) {
                                                     {issue.title}
                                                 </span>
                                             </div>
-                                            <Link href={issue.html_url} target="_blank" className="text-xs text-muted-foreground hover:text-primary whitespace-nowrap ml-2">
+                                            <Link href={issue.html_url} target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground hover:text-primary whitespace-nowrap ml-2">
                                                 View
                                             </Link>
                                         </div>
-                                            );
-                                        })()
-                                    ))
+                                        );
+                                    })
                                 ) : (
                                     <div className="text-center py-4 text-muted-foreground text-sm">No recent issues found.</div>
                                 )}

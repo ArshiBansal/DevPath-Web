@@ -96,6 +96,7 @@ function fmtDate(raw: any): string {
 }
 
 export default function DevCard({ user }: { user: any }) {
+  const IMAGE_WAIT_TIMEOUT_MS = 5000;
   const cardRef = useRef<HTMLDivElement>(null);
   const [rank, setRank]             = useState<number | null>(null);
   const [rankLoading, setRankLoading] = useState(true);
@@ -122,6 +123,10 @@ export default function DevCard({ user }: { user: any }) {
     return () => clearTimeout(t);
   }, []);
 
+  useEffect(() => {
+    setAvatarLoadFailed(false);
+  }, [user?.photoURL]);
+
   const levelInfo   = calculateLevel(user?.points ?? 0);
   const level       = levelInfo.currentLevel;
   const levelColor  = resolveLevelColor(level.color);
@@ -147,10 +152,19 @@ export default function DevCard({ user }: { user: any }) {
     const imgs = Array.from(root.querySelectorAll('img'));
     await Promise.all(
       imgs.map(async (img) => {
-        if (img.complete) return;
+        if (img.complete) {
+          // complete + naturalWidth 0 means a failed image; treat as terminal.
+          if (img.naturalWidth === 0) return;
+          return;
+        }
         if (typeof img.decode === 'function') {
           try {
-            await img.decode();
+            await Promise.race([
+              img.decode(),
+              new Promise<void>((resolve) => {
+                setTimeout(resolve, IMAGE_WAIT_TIMEOUT_MS);
+              }),
+            ]);
             return;
           } catch {
             // Fallback to load/error listeners if decode rejects.
@@ -158,11 +172,17 @@ export default function DevCard({ user }: { user: any }) {
         }
 
         await new Promise<void>((resolve) => {
+          const timeoutId = setTimeout(() => {
+            done();
+          }, IMAGE_WAIT_TIMEOUT_MS);
+
           const done = () => {
             img.removeEventListener('load', done);
             img.removeEventListener('error', done);
+            clearTimeout(timeoutId);
             resolve();
           };
+
           img.addEventListener('load', done, { once: true });
           img.addEventListener('error', done, { once: true });
         });
@@ -232,7 +252,7 @@ export default function DevCard({ user }: { user: any }) {
                   unoptimized
                   crossOrigin="anonymous"
                   referrerPolicy="no-referrer"
-                  loading="eager"
+                  priority
                   onError={() => setAvatarLoadFailed(true)}
                 />
               ) : (
