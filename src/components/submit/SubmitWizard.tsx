@@ -38,42 +38,61 @@ export default function SubmitWizard() {
         }
     };
 
-    const validateStep = (step: number): boolean => {
+    const getStepErrors = (step: number): Partial<Record<keyof FormData, string>> => {
         const newErrors: Partial<Record<keyof FormData, string>> = {};
-        
+
         if (step === 0) {
             if (!formData.title.trim()) newErrors.title = 'Title is required';
             if (!formData.description.trim()) newErrors.description = 'Description is required';
         }
-        
+
         if (step === 1) {
             if (!formData.frameworks.trim()) newErrors.frameworks = 'Frameworks are required';
         }
-        
+
         if (step === 2) {
             if (!formData.demoUrl.trim()) newErrors.demoUrl = 'Demo URL is required';
             if (formData.demoUrl && !formData.demoUrl.startsWith('http')) {
                 newErrors.demoUrl = 'Please enter a valid URL';
             }
         }
-        
+
+        return newErrors;
+    };
+
+    const getAllErrors = (): Partial<Record<keyof FormData, string>> => {
+        return {
+            ...getStepErrors(0),
+            ...getStepErrors(1),
+            ...getStepErrors(2)
+        };
+    };
+
+    const validateStep = (step: number): boolean => {
+        const newErrors = getStepErrors(step);
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const validateAll = (): boolean => {
+        const newErrors = getAllErrors();
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
 
     const handleSubmit = async () => {
-        if (!validateStep(3)) return;
-        
+        if (!validateAll()) return;
+
         setIsSubmitting(true);
-        
+
         try {
             // TODO: Integrate with Firebase project submission
             // This would call the existing project submission logic
             console.log('Submitting project:', formData);
-            
+
             // Simulate API call
             await new Promise(resolve => setTimeout(resolve, 1500));
-            
+
             setIsSubmitted(true);
         } catch (error) {
             console.error('Error submitting project:', error);
