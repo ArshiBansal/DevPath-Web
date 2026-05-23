@@ -145,8 +145,8 @@ export default function DevCard({ user }: { user: any }) {
   const animStreak = useAnimatedCount(user?.streak ?? 0, 900);
 
   const profileUrl = typeof window !== 'undefined'
-    ? `${window.location.origin}/u?uid=${user?.uid}`
-    : `devpath.in/u?uid=${user?.uid}`;
+    ? `${window.location.origin}/u/${user?.uid}`
+    : `devpath.in/u/${user?.uid}`;
 
   const waitForCardImages = async (root: HTMLElement) => {
     const imgs = Array.from(root.querySelectorAll('img'));
