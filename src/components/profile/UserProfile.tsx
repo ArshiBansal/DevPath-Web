@@ -319,7 +319,7 @@ useEffect(() => {
                                     className="object-cover"
                                 />
                             </div>
-                            <button
+                            <button aria-label="Action button" 
                                 onClick={() => setIsEditingPhoto(!isEditingPhoto)}
                                 className="absolute bottom-2 right-2 md:bottom-4 md:right-4 p-2 bg-card text-foreground rounded-full border border-border shadow-md hover:bg-muted transition-colors opacity-0 group-hover:opacity-100 z-10"
                                 title="Change Avatar"
@@ -340,8 +340,8 @@ useEffect(() => {
                                     className="w-full px-3 py-2 text-sm bg-background border border-border rounded-md mb-2"
                                 />
                                 <div className="flex gap-2">
-                                    <button onClick={handleSavePhoto} disabled={isSaving} className="flex-1 bg-primary text-primary-foreground py-1 rounded text-sm">Save</button>
-                                    <button onClick={() => setIsEditingPhoto(false)} className="flex-1 bg-muted text-muted-foreground py-1 rounded text-sm">Cancel</button>
+                                    <button aria-label="Action button"  onClick={handleSavePhoto} disabled={isSaving} className="flex-1 bg-primary text-primary-foreground py-1 rounded text-sm">Save</button>
+                                    <button aria-label="Action button"  onClick={() => setIsEditingPhoto(false)} className="flex-1 bg-muted text-muted-foreground py-1 rounded text-sm">Cancel</button>
                                 </div>
                             </div>
                         )}
@@ -363,7 +363,7 @@ useEffect(() => {
                         <p className="text-muted-foreground text-lg mb-4">@{user.email?.split('@')[0]}</p>
 
                         <div className="w-full mb-6">
-                            <button
+                            <button aria-label="Action button" 
                                 onClick={() => setIsEditingAbout(true)}
                                 className="w-full py-2 bg-card border border-border rounded-lg hover:bg-muted transition-colors font-medium text-sm"
                             >
@@ -372,11 +372,11 @@ useEffect(() => {
                         </div>
 
                         <div className="flex items-center gap-4 text-sm text-muted-foreground mb-6">
-                            <button onClick={openFollowers} className="flex items-center gap-1 hover:text-primary cursor-pointer transition-colors">
+                            <button aria-label="Action button"  onClick={openFollowers} className="flex items-center gap-1 hover:text-primary cursor-pointer transition-colors">
                                 <Users size={16} />
                                 <span className="font-bold text-foreground">{user.followers?.length || 0}</span> followers
                             </button>
-                            <button onClick={openFollowing} className="flex items-center gap-1 hover:text-primary cursor-pointer transition-colors">
+                            <button aria-label="Action button"  onClick={openFollowing} className="flex items-center gap-1 hover:text-primary cursor-pointer transition-colors">
                                 <span className="font-bold text-foreground">{user.following?.length || 0}</span> following
                             </button>
                         </div>
@@ -418,19 +418,19 @@ useEffect(() => {
 
                     {/* Achievements Sidebar Removed as per request */}
                     <div className="pt-6 border-t border-border">
-                        <button
+                        <button aria-label="Action button" 
                             onClick={() => setShowPrivacyModal(true)}
                             className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mb-2"
                         >
                             <Shield size={16} /> Privacy Settings
                         </button>
-                        <button
+                        <button aria-label="Action button" 
                             onClick={handleShareProfile}
                             className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mb-2"
                         >
                             {copied ? <Check size={16} /> : <Share2 size={16} />} Share Profile
                         </button>
-                        <button
+                        <button aria-label="Action button" 
                             onClick={() => {
                                 logout();
                                 window.location.href = '/';
@@ -723,7 +723,7 @@ useEffect(() => {
                                 <Star className="text-yellow-500" size={20} /> About Me
                             </h3>
                             {!isEditingAbout && (
-                                <button onClick={() => setIsEditingAbout(true)} className="text-sm text-primary hover:underline">
+                                <button aria-label="Action button"  onClick={() => setIsEditingAbout(true)} className="text-sm text-primary hover:underline">
                                     <Edit3 size={16} />
                                 </button>
                             )}
@@ -732,8 +732,8 @@ useEffect(() => {
                         {isEditingAbout ? (
                             <div className="space-y-4">
                                 <div className="flex bg-muted rounded-lg p-1 w-fit">
-                                    <button onClick={() => setAboutTab('write')} className={`px-3 py-1 text-sm rounded-md ${aboutTab === 'write' ? 'bg-background shadow-sm' : ''}`}>Write</button>
-                                    <button onClick={() => setAboutTab('preview')} className={`px-3 py-1 text-sm rounded-md ${aboutTab === 'preview' ? 'bg-background shadow-sm' : ''}`}>Preview</button>
+                                    <button aria-label="Action button"  onClick={() => setAboutTab('write')} className={`px-3 py-1 text-sm rounded-md ${aboutTab === 'write' ? 'bg-background shadow-sm' : ''}`}>Write</button>
+                                    <button aria-label="Action button"  onClick={() => setAboutTab('preview')} className={`px-3 py-1 text-sm rounded-md ${aboutTab === 'preview' ? 'bg-background shadow-sm' : ''}`}>Preview</button>
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -796,8 +796,8 @@ useEffect(() => {
                                     </div>
                                 )}
                                 <div className="flex justify-end gap-2">
-                                    <button onClick={() => setIsEditingAbout(false)} className="px-4 py-2 rounded-lg hover:bg-muted">Cancel</button>
-                                    <button onClick={handleSaveAbout} disabled={isSaving} className="px-4 py-2 bg-primary text-primary-foreground rounded-lg">Save</button>
+                                    <button aria-label="Action button"  onClick={() => setIsEditingAbout(false)} className="px-4 py-2 rounded-lg hover:bg-muted">Cancel</button>
+                                    <button aria-label="Action button"  onClick={handleSaveAbout} disabled={isSaving} className="px-4 py-2 bg-primary text-primary-foreground rounded-lg">Save</button>
                                 </div>
                             </div>
                         ) : (
@@ -837,7 +837,7 @@ useEffect(() => {
                             <h3 className="text-xl font-bold flex items-center gap-2">
                                 <Flame className="text-orange-500" size={20} /> Projects
                             </h3>
-                            <button
+                            <button aria-label="Action button" 
                                 onClick={() => {
                                     setProjectToEdit(null);
                                     setShowProjectModal(true);
@@ -897,7 +897,7 @@ useEffect(() => {
                     <div className="bg-card border border-border rounded-xl p-6 w-full max-w-md shadow-2xl">
                         <div className="flex justify-between items-center mb-6">
                             <h3 className="text-xl font-bold">Privacy Settings</h3>
-                            <button onClick={() => setShowPrivacyModal(false)}><X size={24} /></button>
+                            <button aria-label="Action button"  onClick={() => setShowPrivacyModal(false)}><X size={24} /></button>
                         </div>
                         <div className="space-y-4">
                             {['showMobile', 'showLocation', 'showEmail', 'showProjects', 'showRewards', 'isPublic', 'showInCommunity'].map((setting) => (
@@ -924,7 +924,7 @@ useEffect(() => {
                     <div className="bg-card border border-border rounded-xl p-6 w-full max-w-md shadow-2xl max-h-[80vh] flex flex-col">
                         <div className="flex justify-between items-center mb-4 border-b border-border pb-4">
                             <h3 className="text-xl font-bold">{showFollowersModal ? 'Followers' : 'Following'}</h3>
-                            <button onClick={() => { setShowFollowersModal(false); setShowFollowingModal(false); }}><X size={24} /></button>
+                            <button aria-label="Action button"  onClick={() => { setShowFollowersModal(false); setShowFollowingModal(false); }}><X size={24} /></button>
                         </div>
 
                         <div className="flex-1 overflow-y-auto space-y-4 min-h-[200px]">
@@ -969,7 +969,7 @@ useEffect(() => {
                     >
                         <div className="sticky top-0 z-10 flex items-center justify-between p-4 border-b border-border bg-card/95 backdrop-blur">
                             <h2 className="text-xl font-bold truncate pr-4">{selectedProject.title}</h2>
-                            <button
+                            <button aria-label="Action button" 
                                 onClick={() => setSelectedProject(null)}
                                 className="p-2 hover:bg-muted rounded-full transition-colors"
                             >

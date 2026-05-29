@@ -252,7 +252,7 @@ export default function Navbar() {
                                         </Link>
                                     )}
                                     {user && (
-                                        <button
+                                        <button aria-label="Action button" 
                                             className={styles.mobileProfileButton}
                                             onClick={() => {
                                                 logout();

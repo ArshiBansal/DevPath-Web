@@ -157,7 +157,7 @@ export default function QuizComponent({ quizId, questions, onComplete, title = "
         )}
 
         <div className={styles.actionButtons}>
-          <button
+          <button aria-label="Action button" 
             className={styles.retryButton}
             onClick={() => {
               setCurrentQuestion(0);
@@ -169,7 +169,7 @@ export default function QuizComponent({ quizId, questions, onComplete, title = "
             Retake Quiz
           </button>
           {onComplete && (
-            <button className={styles.completeButton} onClick={onComplete}>
+            <button aria-label="Action button"  className={styles.completeButton} onClick={onComplete}>
               Continue
             </button>
           )}
@@ -214,7 +214,7 @@ export default function QuizComponent({ quizId, questions, onComplete, title = "
             }
 
             return (
-              <button
+              <button aria-label="Action button" 
                 key={option}
                 className={optionClass}
                 disabled={showFeedback}
@@ -236,7 +236,7 @@ export default function QuizComponent({ quizId, questions, onComplete, title = "
           </div>
         )}
 
-        <button
+        <button aria-label="Action button" 
           className={styles.nextButton}
           disabled={!selectedAnswer || showFeedback}
           onClick={handleQuizSubmit}
