@@ -37,7 +37,7 @@ export default function LoginPage() {
         if (cooldownSeconds <= 0) return;
 
         const timer = window.setInterval(() => {
-            setCooldownSeconds((current) => (current <= 1 ? 0 : current - 1));
+            setCooldownSeconds((current: number) => (current <= 1 ? 0 : current - 1));
         }, 1000);
 
         return () => window.clearInterval(timer);
@@ -220,9 +220,9 @@ export default function LoginPage() {
     const providerBusy = !!activeProvider;
 
     return (
-        <div className="relative flex min-h-screen items-start justify-center overflow-hidden bg-background px-4 py-2 sm:px-6 lg:px-8 lg:items-center lg:py-4">
-            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.18),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.16),transparent_32%),linear-gradient(135deg,rgba(2,6,23,0.9),rgba(15,23,42,0.96))]" />
-            <div className="pointer-events-none absolute inset-x-0 top-0 h-56 bg-gradient-to-b from-cyan-400/10 to-transparent" />
+        <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4 py-8 sm:px-6 lg:px-8">
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(45,212,191,0.18),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.18),transparent_30%),linear-gradient(135deg,rgba(15,23,42,0.75),rgba(2,6,23,0.95))]" />
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-cyan-400/10 to-transparent" />
 
             <AdminKeyModal
                 isOpen={showAdminKeyModal}
@@ -233,46 +233,46 @@ export default function LoginPage() {
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="relative z-10 w-full max-w-5xl overflow-hidden rounded-[2rem] border border-white/10 bg-white/6 shadow-[0_30px_100px_rgba(0,0,0,0.5)] backdrop-blur-2xl"
+                className="relative z-10 w-full max-w-5xl overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-[0_24px_80px_rgba(0,0,0,0.45)] backdrop-blur-2xl"
             >
-                <div className="grid items-stretch xl:grid-cols-[1.05fr_0.95fr]">
-                    <div className="hidden xl:flex xl:min-h-[620px] flex-col justify-center border-r border-white/10 bg-[linear-gradient(160deg,rgba(13,148,136,0.42),rgba(15,23,42,0.72),rgba(2,6,23,0.92))] p-8 text-white xl:p-10">
-                        <div className="max-w-xl">
-                            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-medium text-white/90 shadow-lg shadow-cyan-950/10">
+                <div className="grid lg:grid-cols-[1.05fr_0.95fr]">
+                    <div className="hidden flex-col justify-between border-r border-white/10 bg-[linear-gradient(160deg,rgba(15,118,110,0.35),rgba(15,23,42,0.65),rgba(2,6,23,0.85))] p-10 text-white lg:flex">
+                        <div>
+                            <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm text-white/90">
                                 <Sparkles size={16} />
                                 Secure access for the DevPath community
                             </div>
-                            <h1 className="max-w-md text-3xl font-bold tracking-tight xl:text-4xl">
+                            <h1 className="max-w-md text-4xl font-bold tracking-tight xl:text-5xl">
                                 Modern sign-in for a faster return to your learning path.
                             </h1>
-                            <p className="mt-3 max-w-lg text-sm leading-6 text-white/72">
+                            <p className="mt-4 max-w-lg text-sm leading-6 text-white/70">
                                 Smooth feedback, better validation, and a cleaner authentication flow that adapts to mobile and desktop.
                             </p>
                         </div>
 
-                        <div className="mt-8 grid gap-3 text-sm text-white/80">
-                            <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/8 p-3.5 backdrop-blur-sm">
+                        <div className="grid gap-4 text-sm text-white/80">
+                            <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/8 p-4">
                                 <ShieldCheck className="text-cyan-300" size={18} />
                                 <span>Verified admin flow and protected session handling</span>
                             </div>
-                            <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/8 p-3.5 backdrop-blur-sm">
+                            <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/8 p-4">
                                 <Lock className="text-cyan-300" size={18} />
                                 <span>Password reset, visibility toggle, and remember-me support</span>
                             </div>
-                            <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/8 p-3.5 backdrop-blur-sm">
+                            <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/8 p-4">
                                 <Sparkles className="text-cyan-300" size={18} />
                                 <span>Responsive UI with stronger feedback on every state change</span>
                             </div>
                         </div>
                     </div>
 
-                    <div className="flex flex-col justify-center p-5 sm:p-6 lg:p-8 xl:min-h-[620px] xl:p-10">
-                        <div className="mb-6 text-center lg:text-left">
-                            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-xs font-medium text-cyan-200 shadow-lg shadow-cyan-950/10">
+                    <div className="p-6 sm:p-8 lg:p-10">
+                        <div className="mb-8 text-center lg:text-left">
+                            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-xs font-medium text-cyan-200">
                                 <LogIn size={14} />
                                 Sign In
                             </div>
-                            <h2 className="text-3xl font-bold tracking-tight sm:text-[2rem]">Welcome back</h2>
+                            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Welcome back</h2>
                             <p className="mt-2 text-sm text-muted-foreground">Sign in to continue to DevPath.</p>
                         </div>
 
@@ -286,7 +286,7 @@ export default function LoginPage() {
                             </div>
                         )}
 
-                        <div className="mb-5 grid gap-3 sm:grid-cols-2">
+                        <div className="mb-6 grid gap-3 sm:grid-cols-2">
                             <button
                                 type="button"
                                 onClick={() => handleProviderLogin('google')}
@@ -307,15 +307,15 @@ export default function LoginPage() {
                             </button>
                         </div>
 
-                        <div className="mb-5 flex items-center gap-3 text-xs uppercase tracking-[0.3em] text-muted-foreground/70">
+                        <div className="mb-6 flex items-center gap-3 text-xs uppercase tracking-[0.3em] text-muted-foreground/70">
                             <span className="h-px flex-1 bg-white/10" />
                             or use email
                             <span className="h-px flex-1 bg-white/10" />
                         </div>
 
-                        <form onSubmit={handleLogin} className="space-y-3.5">
+                        <form onSubmit={handleLogin} className="space-y-4">
                             <div>
-                                <label htmlFor="login-email" className="mb-1.5 block text-sm font-medium text-foreground">Email</label>
+                                <label htmlFor="login-email" className="mb-2 block text-sm font-medium text-foreground">Email</label>
                                 <div className="relative">
                                     <Mail className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
                                     <input
@@ -324,7 +324,7 @@ export default function LoginPage() {
                                         type="email"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        className="w-full rounded-2xl border border-white/10 bg-black/20 py-2.5 pl-10 pr-4 text-sm text-foreground outline-none transition-all duration-200 placeholder:text-muted-foreground/70 focus:border-cyan-300/60 focus:bg-black/30 focus:ring-4 focus:ring-cyan-400/10 disabled:cursor-not-allowed disabled:opacity-50"
+                                        className="w-full rounded-2xl border border-white/10 bg-black/20 py-3 pl-10 pr-4 text-sm text-foreground outline-none transition-all duration-200 placeholder:text-muted-foreground/70 focus:border-cyan-300/60 focus:bg-black/30 focus:ring-4 focus:ring-cyan-400/10 disabled:cursor-not-allowed disabled:opacity-50"
                                         placeholder="name@example.com"
                                         autoComplete="email"
                                         aria-invalid={!!error}
@@ -335,7 +335,7 @@ export default function LoginPage() {
                             </div>
 
                             <div>
-                                <label htmlFor="login-password" className="mb-1.5 block text-sm font-medium text-foreground">Password</label>
+                                <label htmlFor="login-password" className="mb-2 block text-sm font-medium text-foreground">Password</label>
                                 <div className="relative">
                                     <Lock className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
                                     <input
@@ -344,7 +344,7 @@ export default function LoginPage() {
                                         type={showPassword ? 'text' : 'password'}
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
-                                        className="w-full rounded-2xl border border-white/10 bg-black/20 py-2.5 pl-10 pr-12 text-sm text-foreground outline-none transition-all duration-200 placeholder:text-muted-foreground/70 focus:border-cyan-300/60 focus:bg-black/30 focus:ring-4 focus:ring-cyan-400/10 disabled:cursor-not-allowed disabled:opacity-50"
+                                        className="w-full rounded-2xl border border-white/10 bg-black/20 py-3 pl-10 pr-12 text-sm text-foreground outline-none transition-all duration-200 placeholder:text-muted-foreground/70 focus:border-cyan-300/60 focus:bg-black/30 focus:ring-4 focus:ring-cyan-400/10 disabled:cursor-not-allowed disabled:opacity-50"
                                         placeholder="••••••••"
                                         autoComplete="current-password"
                                         aria-invalid={!!error}
@@ -407,7 +407,7 @@ export default function LoginPage() {
 
                             <button
                                 type="submit"
-                                className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-400 to-blue-500 px-4 py-3 font-semibold text-slate-950 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-cyan-500/20 disabled:cursor-not-allowed disabled:opacity-60"
+                                className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-400 to-blue-500 px-4 py-3.5 font-semibold text-slate-950 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-cyan-500/20 disabled:cursor-not-allowed disabled:opacity-60"
                                 disabled={isMaintenanceMode || isSubmitting || cooldownSeconds > 0}
                             >
                                 {isSubmitting ? <Loader2 size={18} className="animate-spin" /> : <LogIn size={18} />}
@@ -415,7 +415,7 @@ export default function LoginPage() {
                             </button>
                         </form>
 
-                        <div className="mt-5 flex flex-col gap-4 text-center text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:text-left">
+                        <div className="mt-6 flex flex-col gap-4 text-center text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:text-left">
                             <p>
                                 Don't have an account?{' '}
                                 <Link href="/signup" className="font-medium text-cyan-300 transition-colors hover:text-cyan-200">
