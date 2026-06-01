@@ -76,6 +76,7 @@ export default function Footer() {
                     <div className="flex flex-col gap-3">
                         <p className="text-xl font-bold tracking-tighter">CONTACT US</p>
                         <a
+                            aria-label="Link"
                             href={`mailto:${siteConfig.contact.email}`}
                             className="text-sm text-cyan-400 hover:underline"
                         >

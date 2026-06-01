@@ -39,7 +39,7 @@ export function ToastContainer() {
     };
 
     return (
-        <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm pointer-events-none">
+        <div aria-live="polite" className="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm pointer-events-none">
             {toasts.map(toast => {
                 const config = typeConfig[toast.type];
                 const Icon = config.icon;
@@ -53,7 +53,7 @@ export function ToastContainer() {
                         <div className="flex-1 pt-0.5">
                             <p className="text-sm font-medium">{toast.message}</p>
                         </div>
-                        <button
+                        <button aria-label="Action button" 
                             onClick={() => removeToast(toast.id)}
                             className={`${config.color} flex-shrink-0 hover:opacity-70 transition-opacity`}
                             aria-label="Close notification"
