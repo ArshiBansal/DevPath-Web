@@ -1,11 +1,12 @@
 "use client";
 
 import React from 'react';
-import { useNotification } from '@/context/NotificationContext';
+import { useRemoveToast, useToasts } from '@/stores/ui-store';
 import { X, AlertCircle, CheckCircle, AlertTriangle, Info } from 'lucide-react';
 
 export function ToastContainer() {
-    const { toasts, removeToast } = useNotification();
+    const toasts = useToasts();
+    const removeToast = useRemoveToast();
 
     const typeConfig = {
         error: {
@@ -39,7 +40,7 @@ export function ToastContainer() {
     };
 
     return (
-        <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm pointer-events-none">
+        <div aria-live="polite" className="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm pointer-events-none">
             {toasts.map(toast => {
                 const config = typeConfig[toast.type];
                 const Icon = config.icon;

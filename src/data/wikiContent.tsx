@@ -1,3 +1,4 @@
+import CodeBlock from '@/components/common/CodeBlock';
 import { ReactNode } from 'react';
 
 export type WikiArticle = {
@@ -158,7 +159,7 @@ export const wikiContent: Record<string, WikiArticle> = {
                 </p>
                 <h2>How to Get Involved</h2>
                 <ul>
-                    <li><strong>Explore Repos:</strong> Check out our <a href="/opensource" className="text-primary hover:underline">Open Source Dashboard</a> to find active projects.</li>
+                    <li><strong>Explore Repos:</strong> Check out our <a aria-label="Link"  href="/opensource" className="text-primary hover:underline">Open Source Dashboard</a> to find active projects.</li>
                     <li><strong>Pick an Issue:</strong> Look for &quot;good first issue&quot; tags if you are just starting out.</li>
                     <li><strong>Submit a PR:</strong> Fork the repo, make your changes, and submit a Pull Request. Our maintainers will review it.</li>
                 </ul>
@@ -220,18 +221,19 @@ export const wikiContent: Record<string, WikiArticle> = {
                 </ul>
                 <h2>Sample Component</h2>
                 <p>Here is a basic React functional counter component using state hooks:</p>
-                <pre className="bg-zinc-950 text-zinc-200 p-4 rounded-xl font-mono text-sm overflow-x-auto my-4 block border border-zinc-800">
-{`import React, { useState } from 'react';
+                <CodeBlock
+                    language="tsx"
+                    code={`import React, { useState } from 'react';
 
 export default function Counter() {
     const [count, setCount] = useState(0);
     return (
-        <button aria-label="Action button"  onClick={() => setCount(count + 1)}>
+        <button aria-label="Action button" onClick={() => setCount(count + 1)}>
             Count: {count}
         </button>
     );
 }`}
-                </pre>
+                />
             </>
         )
     },
@@ -288,12 +290,13 @@ export default function Counter() {
                 </ol>
                 <h2>Quick Commands</h2>
                 <p>Run these terminal commands to initialize your feature work:</p>
-                <pre className="bg-zinc-950 text-zinc-200 p-4 rounded-xl font-mono text-sm overflow-x-auto my-4 block border border-zinc-800">
-{`git checkout -b feature/cool-new-feature
+                <CodeBlock
+                    language="bash"
+                    code={`git checkout -b feature/cool-new-feature
 git add .
 git commit -m "feat: implement extremely cool feature"
 git push origin feature/cool-new-feature`}
-                </pre>
+                />
             </>
         )
     },

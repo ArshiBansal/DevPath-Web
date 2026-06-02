@@ -1,5 +1,6 @@
 "use client";
-
+const STATS_URL = process.env.NEXT_PUBLIC_GITHUB_STATS_URL ?? 'https://github-readme-stats-salesp07.vercel.app';
+const STREAK_URL = process.env.NEXT_PUBLIC_GITHUB_STREAK_URL ?? 'https://github-readme-streak-stats-salesp07.vercel.app';
 import { useEffect, useState, Suspense } from 'react';
 import Image from 'next/image';
 import { doc, getDoc, collection, query, where, getDocs, orderBy, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
@@ -17,7 +18,9 @@ import { useAuth } from '@/context/AuthContext';
 import { GIT_FALLBACK_STATS } from '@/lib/github';
 import { getSafeSocialUrl } from '@/lib/safe-social-url';
 import { copyToClipboard } from '@/lib/clipboard';
+import { useNotificationActions } from '@/stores/ui-store';
 import { useNotification } from '@/context/NotificationContext';
+import NotFoundView from '@/components/layout/NotFoundView';
 
 interface PublicUser {
     id?: string;
@@ -85,11 +88,12 @@ interface Project {
 
 function ProfileContent({ uid }: { uid?: string }) {
     const { user: currentUser } = useAuth();
-    const { showSuccess, showError } = useNotification();
+    const { showSuccess, showError } = useNotificationActions();
     const [user, setUser] = useState<PublicUser | null>(null);
     const [projects, setProjects] = useState<Project[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [showNotFound, setShowNotFound] = useState(false);
     const [activeTab, setActiveTab] = useState('Overview');
     const [copied, setCopied] = useState(false);
     const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -111,16 +115,19 @@ function ProfileContent({ uid }: { uid?: string }) {
 
             if (!currentUid || currentUid === 'u') {
                 setError('No user specified.');
+                setShowNotFound(false);
                 setLoading(false);
                 return;
             }
             if (currentUid.length < 3 || currentUid.length > 128 || /[<>"']/.test(currentUid)) {
                 setError('Invalid user identifier.');
+                setShowNotFound(true);
                 setLoading(false);
                 return;
             }
             setLoading(true);
             setError('');
+            setShowNotFound(false);
 
             try {
                 let userData: PublicUser | undefined;
@@ -167,6 +174,7 @@ function ProfileContent({ uid }: { uid?: string }) {
                     // Privacy Check
                     if (userData.privacySettings?.isPublic === false) {
                         setError('This profile is private.');
+                        setShowNotFound(true);
                         setLoading(false);
                         return;
                     }
@@ -288,10 +296,12 @@ function ProfileContent({ uid }: { uid?: string }) {
 
                 } else {
                     setError('User not found.');
+                    setShowNotFound(true);
                 }
             } catch (err) {
                 console.error("Error fetching user:", err);
                 setError('Failed to load profile.');
+                setShowNotFound(false);
             } finally {
                 setLoading(false);
             }
@@ -381,6 +391,10 @@ function ProfileContent({ uid }: { uid?: string }) {
     }
 
     if (error || !user) {
+        if (showNotFound) {
+            return <NotFoundView />;
+        }
+
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4 text-center">
                 <UserIcon size={64} className="text-muted-foreground mb-4" />
@@ -454,17 +468,17 @@ function ProfileContent({ uid }: { uid?: string }) {
 
                             <div className="flex flex-wrap gap-3 mt-3">
                                 {safeSocialLinks.github && (
-                                    <a href={safeSocialLinks.github} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-sm hover:text-primary transition-colors">
+                                    <a aria-label="Link"  href={safeSocialLinks.github} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-sm hover:text-primary transition-colors">
                                         <Github size={14} /> GitHub
                                     </a>
                                 )}
                                 {safeSocialLinks.linkedin && (
-                                    <a href={safeSocialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-sm hover:text-primary transition-colors">
+                                    <a aria-label="Link"  href={safeSocialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-sm hover:text-primary transition-colors">
                                         <Linkedin size={14} /> LinkedIn
                                     </a>
                                 )}
                                 {safeSocialLinks.instagram && (
-                                    <a href={safeSocialLinks.instagram} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-sm hover:text-primary transition-colors">
+                                    <a aria-label="Link"  href={safeSocialLinks.instagram} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-sm hover:text-primary transition-colors">
                                         <Instagram size={14} /> Instagram
                                     </a>
                                 )}
@@ -559,14 +573,14 @@ function ProfileContent({ uid }: { uid?: string }) {
                                     <div className="w-full">
                                         <Image
                                             alt={`${user.githubStats.username} GitHub profile stats in dark theme`}
-                                            src={`https://github-readme-stats-salesp07.vercel.app/api?username=${user.githubStats.username}&count_private=true&show_icons=true&title_color=00bfbf&icon_color=00bfbf&text_color=c9d1d9&bg_color=0d1117&rank_icon=github&border_radius=20&hide_border=true`}
+                                            src={`${STATS_URL}/api?username=${user.githubStats.username}&count_private=true&show_icons=true&title_color=00bfbf&icon_color=00bfbf&text_color=c9d1d9&bg_color=0d1117&rank_icon=github&border_radius=20&hide_border=true`}
                                             width={467}
                                             height={195}
                                             className="w-full h-auto hidden dark:block"
                                         />
                                         <Image
                                             alt={`${user.githubStats.username} GitHub profile stats in light theme`}
-                                            src={`https://github-readme-stats-salesp07.vercel.app/api?username=${user.githubStats.username}&count_private=true&show_icons=true&title_color=000000&icon_color=000000&text_color=000000&bg_color=ffffff&rank_icon=github&border_radius=20&hide_border=true`}
+                                            src={`${STATS_URL}/api?username=${user.githubStats.username}&count_private=true&show_icons=true&title_color=000000&icon_color=000000&text_color=000000&bg_color=ffffff&rank_icon=github&border_radius=20&hide_border=true`}
                                             width={467}
                                             height={195}
                                             className="w-full h-auto dark:hidden"
@@ -575,14 +589,14 @@ function ProfileContent({ uid }: { uid?: string }) {
                                     <div className="w-full">
                                         <Image
                                             alt={`${user.githubStats.username} GitHub contribution streak in dark theme`}
-                                            src={`https://github-readme-streak-stats-salesp07.vercel.app/?user=${user.githubStats.username}&count_private=true&border_radius=20&ring=00bfbf&stroke=c9d1d9&background=0d1117&fire=00bfbf&currStreakNum=00bfbf&sideNums=00bfbf&datesside=00bfbf&Labelscurr=00bfbf&currStreakLabel=00bfbf&sideLabels=00bfbf&dates=c9d1d9&border=c9d1d9&hide_border=true`}
+                                            src={`${STREAK_URL}/?user=${user.githubStats.username}&count_private=true&border_radius=20&ring=00bfbf&stroke=c9d1d9&background=0d1117&fire=00bfbf&currStreakNum=00bfbf&sideNums=00bfbf&datesside=00bfbf&Labelscurr=00bfbf&currStreakLabel=00bfbf&sideLabels=00bfbf&dates=c9d1d9&border=c9d1d9&hide_border=true`}
                                             width={467}
                                             height={195}
                                             className="w-full h-auto hidden dark:block"
                                         />
                                         <Image
                                             alt={`${user.githubStats.username} GitHub contribution streak in light theme`}
-                                            src={`https://github-readme-streak-stats-salesp07.vercel.app/?user=${user.githubStats.username}&count_private=true&border_radius=20&ring=000000&stroke=000000&background=ffffff&fire=ff0000&currStreakNum=000000&sideNums=000000&datesside=000000&Labelscurr=000000&currStreakLabel=000000&sideLabels=000000&dates=000000&border=000000&hide_border=true`}
+                                            src={`${STREAK_URL}/?user=${user.githubStats.username}&count_private=true&border_radius=20&ring=000000&stroke=000000&background=ffffff&fire=ff0000&currStreakNum=000000&sideNums=000000&datesside=000000&Labelscurr=000000&currStreakLabel=000000&sideLabels=000000&dates=000000&border=000000&hide_border=true`}
                                             width={467}
                                             height={195}
                                             className="w-full h-auto dark:hidden"
@@ -611,7 +625,7 @@ function ProfileContent({ uid }: { uid?: string }) {
                                                             {event.type.replace('Event', '').replace(/([A-Z])/g, ' $1').trim()}
                                                         </span>
                                                         {' '}on{' '}
-                                                        <a href={event.repo.url} target="_blank" className="text-primary hover:underline font-medium">
+                                                        <a aria-label="Link"  href={event.repo.url} target="_blank" className="text-primary hover:underline font-medium">
                                                             {event.repo.name}
                                                         </a>
                                                     </p>
@@ -706,7 +720,7 @@ function ProfileContent({ uid }: { uid?: string }) {
                                     <div className="aspect-video bg-muted relative group overflow-hidden">
                                         {project.videoUrl ? (
                                             <div className="w-full h-full flex items-center justify-center bg-black/5">
-                                                <a
+                                                <a aria-label="Link" 
                                                     href={project.videoUrl}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
@@ -746,7 +760,7 @@ function ProfileContent({ uid }: { uid?: string }) {
                                             <h3 className="font-bold text-lg line-clamp-1" title={project.title}>{project.title}</h3>
                                             <div className="flex gap-1">
                                                 {project.websiteUrl && (
-                                                    <a
+                                                    <a aria-label="Link" 
                                                         href={project.websiteUrl}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
@@ -893,7 +907,7 @@ function ProfileContent({ uid }: { uid?: string }) {
                                 {/* Links & Skills */}
                                 <div className="flex flex-wrap gap-4 pt-4 border-t border-border">
                                     {selectedProject.websiteUrl && (
-                                        <a
+                                        <a aria-label="Link" 
                                             href={selectedProject.websiteUrl}
                                             target="_blank"
                                             rel="noopener noreferrer"
@@ -943,13 +957,7 @@ function SearchParamsFallback() {
     }
 
     if (!isValidUid(uid)) {
-        return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4 text-center">
-                <UserIcon size={64} className="text-muted-foreground mb-4" />
-                <h1 className="text-2xl font-bold mb-2">Invalid Profile</h1>
-                <p className="text-muted-foreground">The requested profile identifier is invalid.</p>
-            </div>
-        );
+        return <NotFoundView />;
     }
 
     return <ProfileContent uid={uid} />;
