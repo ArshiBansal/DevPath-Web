@@ -5,6 +5,7 @@ const config: Config = {
 
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
+    '\\.css$': '<rootDir>/tests/styleMock.js',
   },
   transform: {
     '^.+\\.(ts|tsx)$': 'babel-jest',
