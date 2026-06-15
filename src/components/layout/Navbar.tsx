@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useSpring } from 'framer-motion';
 import {
   Flame,
   Github,
@@ -49,10 +49,26 @@ export default function Navbar() {
 
   const pathname = usePathname();
 
+  useEffect(() => {
+    const handleCloseAll = () => {
+      setMobileMenuOpen(false);
+      setBookmarkDrawerOpen(false);
+    };
+    window.addEventListener('close-all-overlays', handleCloseAll);
+    return () => window.removeEventListener('close-all-overlays', handleCloseAll);
+  }, []);
+
   const { currentStreak } = useMemo(
     () => calculateStreak(user?.loginDates),
     [user?.loginDates]
   );
+
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001,
+  });
 
   if (pathname === '/ap') return null;
 

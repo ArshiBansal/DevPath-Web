@@ -360,7 +360,7 @@ export default function DevCard({ user }: { user: any }) {
 
       const a = document.createElement('a');
       a.href = dataUrl;
-      a.download = `devcard-${user?.name?.replace(/\s+/g, '-').toLowerCase() ?? 'devcard'}.png`;
+      a.download = `devcard-${realTimeUser?.name?.replace(/\s+/g, '-').toLowerCase() ?? 'devcard'}.png`;
       a.click();
 
       showSuccess('DevCard downloaded successfully.');
